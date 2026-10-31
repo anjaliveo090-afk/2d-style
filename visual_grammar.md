@@ -22,10 +22,24 @@ The sample (`animator/sample.py`) measured:
 
 | Measure | Sample |
 |---|---|
-| New visual | every 1.29 s (median gap 1.35 s) |
-| Camera speed median / mean | 0.02 / 4.86 |
-| Non-camera motion | 3.27 |
-| Held frames | 0.87 |
+| New visual | every 1.29 s (median gap 1.25 s) |
+| Camera speed median / mean | 0.02 / 4.35 |
+| Non-camera motion | 2.87 |
+| Held frames | 0.85 |
+
+The first user story (`animator/apple.py`) measured:
+
+| Measure | apple.py |
+|---|---|
+| New visual | every 1.27 s |
+| Camera speed median / mean | 0.05 / 3.40 |
+| Non-camera motion | 3.53 |
+| Held frames | 0.86 |
+
+How the motion is made:
+- Characters "settle" every 0.25 s: the head and hands shift a few screen pixels, capped at 4 px / 10 px, so face close-ups stay almost still like the references.
+- Prop inserts use `sets.settle(ctx, T)` for the same effect.
+- Real actions (cranks turning, things popping in) carry the rest.
 
 What this means:
 - The pace comes from **cuts on almost every phrase** (2-5 words) and from **pose and expression swaps**, not from camera moves.

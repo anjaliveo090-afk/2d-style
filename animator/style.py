@@ -242,7 +242,9 @@ class BoxChar:
         # held-pose settle: every quarter second the head and hands shift a little, then hold
         # (the references change a drawing every 3-4 frames and hold it in between)
         beat = (1 if int(t * 4) % 2 else -1) * bob
-        hb = top + 0.05 * U + head_nod + 0.026 * U * beat
+        # capped in screen pixels: close-ups stay almost still, like the references
+        dpx = math.hypot(*ctx.user_to_device_distance(1.0, 0.0)) or 1.0
+        hb = top + 0.05 * U + head_nod + min(0.026 * U, 4.0 / dpx) * beat
         hx = look * 0.03 * U
         arm_pts = []
         for i, side in enumerate((-1, 1)):
@@ -250,7 +252,7 @@ class BoxChar:
             sx, sy = side * (sw / 2 - aw * 0.2), top + 0.13 * U
             pts = self._arm_joints(a, side, sx, sy, U, t)
             if a not in ("behind", "wave"):
-                j = 0.06 * U * beat
+                j = min(0.06 * U, 10.0 / dpx) * beat
                 pts = [pts[0], (pts[1][0] + side * j * 0.5, pts[1][1] - j * 0.4), (pts[2][0] + side * j, pts[2][1] - j)]
             arm_pts.append((a, side, pts))
 

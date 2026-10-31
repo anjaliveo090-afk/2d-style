@@ -90,3 +90,9 @@ These factors are relative to the voice file's own loudness, so **measure every 
 - new SFX scale = old scale x 10^((−6.5 − measured SFX median dB) / 20).
 
 One correction pass is usually enough.
+
+Example: `animator/apple.py` with the user's real voiceover (−23.6 dB RMS, quieter than Piper).
+- The first mix at 0.19 / 0.3 measured music −8.2 dB and SFX −0.3 dB.
+- One correction gave **music 0.103 and SFX scale 0.147**.
+- The SFX scale was then nudged to 0.18 so the quieter pops under the voice count. That moved SFX from 4.8 to 5.1 per 10 s.
+- Final mix: music −13.4 dB, C minor, SFX 5.1 per 10 s, median −5.5 dB, 44% on cuts.

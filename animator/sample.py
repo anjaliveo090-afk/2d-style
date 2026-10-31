@@ -111,13 +111,18 @@ def s_phone(ctx, t, d):
     T = 8.65 + t
     st.bg(ctx, "#62527a")
     tap = 9.4 <= T < 9.6
+    ctx.save()
+    st.settle(ctx, T)
     st.phone(ctx, 360, 640, 4.0, rot=-0.08, glow=1.0)
+    ctx.restore()
     st.hand(ctx, 170, 760, 1.5, rot=PI * 0.8, col=DAD_SKIN, pose="fist")
     st.hand(ctx, 560 - (20 if tap else 0), 700 - (40 if tap else 0), 1.5, rot=PI * 0.15, col=DAD_SKIN)
 
 
 def s_night(ctx, t, d):
+    T = 9.95 + t
     st.bg(ctx, "#52567a")
+    st.settle(ctx, T)
     st.window(ctx, 360, 600, 380, 470, view="night", tilt=-0.04)
     ctx.save()
     ctx.rectangle(180, 380, 360, 440)
@@ -140,6 +145,7 @@ def s_pillow(ctx, t, d):
 def s_years(ctx, t, d):
     T = 12.60 + t
     st.bg(ctx, "#cae2fe")
+    st.settle(ctx, T)
     for k, (yr, x, y, r, at) in enumerate((("2016", 250, 360, -0.12, 12.6), ("2021", 480, 610, 0.1, 12.81),
                                            ("2026", 260, 880, -0.06, 13.07))):
         if T >= at:
@@ -166,6 +172,7 @@ def s_box(ctx, t, d):
     T = 15.35 + t
     st.bg(ctx, "#4666aa")
     sc = 2.4 * pop_in(T, 15.6, 0.15) if T >= 15.6 else 2.4
+    st.settle(ctx, T)
     st.cardboard_box(ctx, 360, 860, sc)
     if T >= 15.95:
         g = clamp((T - 15.95) / 0.25) * (1 - clamp((T - 16.4) / 0.2))
@@ -176,6 +183,7 @@ def s_note(ctx, t, d):
     T = 16.55 + t
     st.bg(ctx, "#e2b672")
     u = ease((T - 16.85) / 0.3)
+    st.settle(ctx, T, 6)
     st.note(ctx, 360, 620, 2.2, unfold=u, rot=-0.05)
     for side in (-1, 1):
         st.hand(ctx, 360 + side * 300, 640, 1.4, rot=0 if side > 0 else PI, col=DAD_SKIN, pose="fist")
