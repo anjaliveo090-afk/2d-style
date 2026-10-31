@@ -456,6 +456,7 @@ def hand(ctx, x, y, s=1.0, rot=0.0, col="#fdcdc7", pose="open", length=6.0):
     FROM (0 = from the right). pose: open, fist, grab."""
     lw = lw_at(ctx, 96 * s)
     u = 96 * s
+    col = hexc(col) if isinstance(col, str) else col
     ctx.save()
     ctx.translate(x, y)
     ctx.rotate(rot)
@@ -464,7 +465,7 @@ def hand(ctx, x, y, s=1.0, rot=0.0, col="#fdcdc7", pose="open", length=6.0):
     ctx.line_to(0.25 * u, 0.28 * u)
     ctx.curve_to(0.6 * u, 0.3 * u, 2 * u, 0.34 * u, length * u, 0.32 * u)
     ctx.close_path()
-    fill_ink(ctx, hexc(col), lw)
+    fill_ink(ctx, col, lw)
     if pose == "fist":
         oval(ctx, 0, 0, 0.48 * u, 0.42 * u, col, lw)
         for k in range(3):
@@ -476,7 +477,7 @@ def hand(ctx, x, y, s=1.0, rot=0.0, col="#fdcdc7", pose="open", length=6.0):
         ctx.curve_to(-0.2 * u, -0.45 * u, -0.6 * u, -0.25 * u, -0.6 * u, 0.0)
         ctx.curve_to(-0.6 * u, 0.25 * u, -0.2 * u, 0.42 * u, 0.3 * u, 0.3 * u)
         ctx.close_path()
-        fill_ink(ctx, hexc(col), lw)
+        fill_ink(ctx, col, lw)
         oval(ctx, -0.05 * u, -0.38 * u, 0.24 * u, 0.12 * u, col, lw, rot=-0.4)
     ctx.restore()
 
@@ -902,6 +903,158 @@ def counter_front(ctx, y=900, col="#e9e3d8", top="#c9c2b6"):
         rect(ctx, 40 + k * 170, y + 80, 150, 260, col, lw, r=8)
 
 
+# ---------------------------------------------------------------- Halloween props (halloween story)
+def pumpkin(ctx, x, y, r=60, face=True, lit=True):
+    """Jack-o'-lantern, centre at (x, y)."""
+    lw = lw_at(ctx, r * 2)
+    for k, (dx, w) in enumerate(((-0.45, 0.62), (0.45, 0.62), (0.0, 0.7))):
+        oval(ctx, x + dx * r, y, w * r, 0.85 * r, "#f08a24" if k < 2 else "#f59a32", lw)
+    rect(ctx, x - 0.1 * r, y - 1.05 * r, 0.2 * r, 0.3 * r, "#5c7a2e", lw, r=0.05 * r)
+    if face:
+        glow = "#ffd84a" if lit else "#3a2a22"
+        for k in (-1, 1):
+            poly(ctx, [(x + k * 0.38 * r, y - 0.35 * r), (x + k * 0.18 * r, y - 0.05 * r),
+                       (x + k * 0.58 * r, y - 0.05 * r)], glow, lw)
+        poly(ctx, [(x - 0.55 * r, y + 0.2 * r), (x - 0.3 * r, y + 0.42 * r), (x - 0.1 * r, y + 0.28 * r),
+                   (x + 0.1 * r, y + 0.45 * r), (x + 0.32 * r, y + 0.28 * r), (x + 0.55 * r, y + 0.2 * r),
+                   (x + 0.3 * r, y + 0.6 * r), (x - 0.3 * r, y + 0.6 * r)], glow, lw)
+
+
+def witch_hat(ctx, cx, top, U, col="#3a2a4a", band="#8a5ad8"):
+    lw = lw_at(ctx, U)
+    oval(ctx, cx, top + 0.02 * U, 0.75 * U, 0.12 * U, col, lw)
+    poly(ctx, [(cx - 0.42 * U, top), (cx + 0.1 * U, top - 1.1 * U), (cx + 0.38 * U, top - 0.95 * U),
+               (cx + 0.42 * U, top)], col, lw)
+    rect(ctx, cx - 0.41 * U, top - 0.16 * U, 0.82 * U, 0.14 * U, band, lw)
+
+
+def cat_ears(ctx, cx, top, U, col="#2e2e30", inner="#f2a0b4"):
+    lw = lw_at(ctx, U)
+    for k in (-1, 1):
+        poly(ctx, [(cx + k * 0.42 * U, top + 0.04 * U), (cx + k * 0.36 * U, top - 0.36 * U),
+                   (cx + k * 0.12 * U, top + 0.04 * U)], col, lw)
+        poly(ctx, [(cx + k * 0.36 * U, top), (cx + k * 0.33 * U, top - 0.22 * U), (cx + k * 0.2 * U, top)], inner, lw)
+
+
+def cape(ctx, cx, top, U, length=3.0, col="#1c1a24", lining="#b8222a", spread=1.0):
+    """Vampire cape BEHIND a character (call before drawing it): wide from the shoulders down."""
+    lw = lw_at(ctx, U)
+    sh = top + 0.9 * U
+    ctx.move_to(cx - 0.5 * U, sh)
+    ctx.curve_to(cx - 1.2 * spread * U, sh + 1.0 * U, cx - 1.3 * spread * U, sh + 2.2 * U,
+                 cx - 1.0 * spread * U, sh + length * U)
+    for k in range(5):     # scalloped hem
+        xa = cx - 1.0 * spread * U + (k + 0.5) * 0.4 * spread * U
+        ctx.line_to(xa, sh + (length - 0.25) * U)
+        ctx.line_to(xa + 0.2 * spread * U, sh + length * U)
+    ctx.curve_to(cx + 1.3 * spread * U, sh + 2.2 * U, cx + 1.2 * spread * U, sh + 1.0 * U, cx + 0.5 * U, sh)
+    ctx.close_path()
+    fill_ink(ctx, hexc(lining), lw)
+    ctx.move_to(cx - 0.5 * U, sh)
+    ctx.curve_to(cx - 1.0 * spread * U, sh + 1.0 * U, cx - 1.1 * spread * U, sh + 2.0 * U,
+                 cx - 0.85 * spread * U, sh + (length - 0.1) * U)
+    ctx.line_to(cx + 0.85 * spread * U, sh + (length - 0.1) * U)
+    ctx.curve_to(cx + 1.1 * spread * U, sh + 2.0 * U, cx + 1.0 * spread * U, sh + 1.0 * U, cx + 0.5 * U, sh)
+    ctx.close_path()
+    fill_ink(ctx, hexc(col), lw)
+
+
+def cape_collar(ctx, cx, bottom, U, col="#1c1a24", lining="#b8222a"):
+    """High pointed collar standing up beside the head (call after drawing the character)."""
+    lw = lw_at(ctx, U)
+    for k in (-1, 1):
+        poly(ctx, [(cx + k * 0.45 * U, bottom + 0.05 * U), (cx + k * 0.95 * U, bottom - 0.55 * U),
+                   (cx + k * 0.6 * U, bottom + 0.25 * U)], lining, lw)
+        poly(ctx, [(cx + k * 0.6 * U, bottom + 0.25 * U), (cx + k * 0.95 * U, bottom - 0.55 * U),
+                   (cx + k * 1.0 * U, bottom + 0.3 * U)], col, lw)
+
+
+def fangs(ctx, cx, my, U):
+    """Two white fangs under the mouth line (draw after the face; my = mouth y)."""
+    lw = lw_at(ctx, U)
+    for k in (-1, 1):
+        poly(ctx, [(cx + k * 0.07 * U, my), (cx + k * 0.035 * U, my + 0.09 * U), (cx + k * 0.0 * U, my)],
+             "#ffffff", lw * 0.8)
+
+
+def ghost(ctx, x, y, s=1.0, T=0.0):
+    """Kid under a white sheet with eye holes, bottom centre at (x, y)."""
+    lw = lw_at(ctx, 96 * s)
+    u = 96 * s
+    ctx.move_to(x - 0.7 * u, y)
+    ctx.curve_to(x - 0.8 * u, y - 1.6 * u, x - 0.6 * u, y - 2.6 * u, x, y - 2.6 * u)
+    ctx.curve_to(x + 0.6 * u, y - 2.6 * u, x + 0.8 * u, y - 1.6 * u, x + 0.7 * u, y)
+    for k in range(4):
+        xa = x + 0.7 * u - (k + 0.5) * 0.35 * u
+        ctx.line_to(xa, y - (0.12 if k % 2 else 0.0) * u - 0.1 * u)
+        ctx.line_to(xa - 0.175 * u, y)
+    ctx.close_path()
+    fill_ink(ctx, hexc("#f6f6f2"), lw)
+    for k in (-1, 1):
+        oval(ctx, x + k * 0.22 * u, y - 1.95 * u, 0.1 * u, 0.15 * u, "#1c1a24", lw * 0.6)
+
+
+def candy_bowl(ctx, x, y, s=1.0, full=1.0, seed=7):
+    """Bowl of wrapped candy, bowl rim centre at (x, y); full 0..1."""
+    lw = lw_at(ctx, 96 * s)
+    u = 96 * s
+    rnd = random.Random(seed)
+    cols = ["#e2483a", "#f0c814", "#7e54ae", "#3aa8a0", "#f08a24", "#9cb41e"]
+    for k in range(int(14 * full)):
+        cx, cy = x + rnd.uniform(-1.05, 1.05) * u, y - rnd.uniform(0.0, 0.45) * u
+        a = rnd.uniform(-0.6, 0.6)
+        c = cols[k % len(cols)]
+        ctx.save()
+        ctx.translate(cx, cy)
+        ctx.rotate(a)
+        for e in (-1, 1):
+            poly(ctx, [(e * 0.16 * u, 0), (e * 0.3 * u, -0.1 * u), (e * 0.3 * u, 0.1 * u)], c, lw * 0.8)
+        oval(ctx, 0, 0, 0.18 * u, 0.12 * u, c, lw * 0.8)
+        ctx.restore()
+    ctx.move_to(x - 1.3 * u, y)
+    ctx.curve_to(x - 1.2 * u, y + 1.0 * u, x + 1.2 * u, y + 1.0 * u, x + 1.3 * u, y)
+    ctx.close_path()
+    fill_ink(ctx, hexc("#f08a24"), lw)
+    oval(ctx, x, y, 1.3 * u, 0.12 * u, "#f59a32", lw)
+
+
+def sign(ctx, x, y, w, h, lines, col="#fbf7ee", ink="#1c1a24", rot=0.0, size=None):
+    """Hand-written cardboard sign (e.g. PLEASE TAKE 1)."""
+    lw = lw_at(ctx, w * 0.4)
+    ctx.save()
+    ctx.translate(x, y)
+    ctx.rotate(rot)
+    rect(ctx, -w / 2, -h / 2, w, h, col, lw)
+    size = size or h / (len(lines) + 0.8)
+    for k, ln in enumerate(lines):
+        scrawl(ctx, ln, 0, -h / 2 + size * (k + 0.95), size * 0.8, hexc(ink), 0.0)
+    ctx.restore()
+
+
+def bucket(ctx, x, y, s=1.0):
+    """Pumpkin trick-or-treat bucket, centre at (x, y), handle on top."""
+    u = 96 * s
+    ctx.new_sub_path()
+    ctx.arc(x, y - 0.3 * u, 0.55 * u, PI, 2 * PI)
+    _ink(ctx, lw_at(ctx, u) * 1.5)
+    pumpkin(ctx, x, y + 0.2 * u, 0.5 * u)
+
+
+def night_street(ctx, T=0.0, sky="#2e2a4a", ground="#3a3550"):
+    """Flat night street: moon, a row of simple houses with lit windows, pumpkins on the steps."""
+    lw = lw_at(ctx, 150)
+    bg(ctx, sky)
+    stars_field(ctx, seed=5, n=18)
+    moon(ctx, 560, 260, 70)
+    for k, (x, w, h, col, roof) in enumerate(((60, 230, 300, "#5a4e74", "#2a2236"), (300, 200, 360, "#4e5a74", "#22283a"),
+                                             (510, 250, 280, "#6a4e5e", "#30222a"))):
+        rect(ctx, x, 880 - h, w, h, col, lw)
+        poly(ctx, [(x - 20, 880 - h), (x + w / 2, 880 - h - 110), (x + w + 20, 880 - h)], roof, lw)
+        for j in range(2):
+            rect(ctx, x + 30 + j * (w - 100), 880 - h + 60, 60, 70, "#ffd84a", lw)
+    rect(ctx, -300, 880, W + 600, 700, ground, lw)
+
+
 # ---------------------------------------------------------------- effect marks
 def sparkle(ctx, x, y, r, col="#f0c814", rot=0.0):
     """4-point star (glint on a new object, joy stars around a happy face)."""
@@ -1005,6 +1158,8 @@ def draw_item(ctx, item, x, y, U, t, side):
         knife(ctx, x, y, s * 0.6, rot=-PI / 2 - side * 0.5)
     elif item == "gift":
         gift_box(ctx, x - side * 0.1 * U, y + 0.35 * U, s * 0.55)
+    elif item == "bucket":
+        bucket(ctx, x, y + 0.45 * U, s * 0.6)
     elif item == "ball":
         ball(ctx, x, y + 0.2 * U, 0.3 * U)
     else:

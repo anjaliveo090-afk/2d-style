@@ -323,6 +323,14 @@ class BoxChar:
         half = max(sw / 2 + aw, 0.6 * U) + 0.1 * U
         LAST_BOX["box"] = (x - half, y + hb - hh - 0.35 * U, x + half, y + 0.05 * U)
 
+    def head_geo(self, x, y, s=1.0):
+        """(centre x, head top y, head width U, head height) of a standing pose drawn at (x, y, s):
+        for hats, ears, costume collars and other things placed on the head."""
+        b = self.b
+        U = self.unit(s)
+        top = y - (b["leg"] + b["torso"] - 0.05 + b["head_h"]) * U
+        return x, top, U, b["head_h"] * U
+
     def draw_close(self, ctx, cx, head_top, head_w, expr="neutral", t=0.0, **kw):
         """Face close-up helper: head of width head_w px with its top at head_top (body runs off
         the bottom of the frame, like the references' chest-up shots)."""
